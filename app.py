@@ -4,12 +4,15 @@ from moviepy.editor import TextClip, AudioFileClip
 import os
 import math
 
+# 設定 Streamlit 頁面
 st.set_page_config(page_title="AI 課後複習 App", layout="centered")
 st.title("📚 AI 課後複習 App Demo")
 
+# -------- 教師端 --------
 st.header("教師上傳文章 / 單字")
 article = st.text_area("請輸入文章或單字", height=150)
 
+# 根據文字長度估算影片長度
 def estimate_duration(text):
     words = len(text.split())
     return max(5, math.ceil(words / 2.5))
@@ -21,10 +24,15 @@ if st.button("生成影片與語音"):
         audio_file = "lesson_audio.mp3"
         tts = gTTS(text=article, lang="en")
         tts.save(audio_file)
+
         duration = estimate_duration(article)
 
         clip = TextClip(
-            article, fontsize=40, color="white", size=(1280, 720), method="caption"
+            article,
+            fontsize=40,
+            color="white",
+            size=(1280, 720),
+            method="caption"
         ).set_duration(duration)
 
         audio_clip = AudioFileClip(audio_file)
