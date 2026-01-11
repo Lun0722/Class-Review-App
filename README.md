@@ -1,64 +1,30 @@
 import streamlit as st
 from gtts import gTTS
-from moviepy.editor import TextClip, AudioFileClip
 import os
-import math
 
-# 設定 Streamlit 頁面
-st.set_page_config(page_title="AI 課後複習 App", layout="centered")
-st.title("📚 AI 課後複習 App Demo")
+# Set Streamlit page config
+st.set_page_config(page_title="EIE Institute Class Review", layout="centered")
+st.title("📚 EIE Institute Class Review")
 
-# -------- 教師端 --------
-st.header("教師上傳文章 / 單字")
-article = st.text_area("請輸入文章或單字", height=150)
+# -------- Text input --------
+text = st.text_area("Enter your article or vocabulary here", height=150)
 
-# 根據文字長度估算影片長度
-def estimate_duration(text):
-    words = len(text.split())
-    return max(5, math.ceil(words / 2.5))  # 約每秒 2.5 字
-
-# 生成影片與語音
-if st.button("生成影片與語音"):
-
-    if not article.strip():
-        st.warning("請先輸入文章或單字")
+# -------- Generate audio --------
+if st.button("Generate Audio"):
+    if not text.strip():
+        st.warning("Please enter some text first.")
     else:
-        # 生成語音
         audio_file = "lesson_audio.mp3"
-        tts = gTTS(text=article, lang="en")
+        tts = gTTS(text=text, lang="en")
         tts.save(audio_file)
 
-        # 估算影片長度
-        duration = estimate_duration(article)
+        st.success("Audio has been generated successfully! 🎉")
+        st.audio(audio_file, format="audio/mp3")
 
-        # 生成影片
-        clip = TextClip(
-            article,
-            fontsize=40,
-            color="white",
-            size=(1280, 720),
-            method="caption"
-        ).set_duration(duration)
-
-        # 將語音加到影片
-        audio_clip = AudioFileClip(audio_file)
-        video = clip.set_audio(audio_clip)
-
-        video_file = "lesson_video.mp4"
-        video.write_videofile(video_file, fps=24, verbose=False, logger=None)
-
-        st.success("影片與語音生成完成！🎉")
-
-        # -------- 學生端 --------
-        st.header("學生端播放區")
-        st.video(video_file)
-        st.audio(audio_file)
-
-# -------- 清理暫存檔案 --------
-def cleanup():
-    for f in ["lesson_audio.mp3", "lesson_video.mp4"]:
-        if os.path.exists(f):
-            os.remove(f)
-    st.success("暫存檔案已清理 ✅")
-
-st.button("清理暫存檔案", on_click=cleanup)
+# -------- Clean up --------
+if st.button("Clear Audio File"):
+    if os.path.exists("lesson_audio.mp3"):
+        os.remove("lesson_audio.mp3")
+        st.success("Audio file has been cleared ✅")
+    else:
+        st.info("No audio file to clear.")
