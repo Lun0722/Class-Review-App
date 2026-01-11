@@ -6,7 +6,9 @@ import base64
 st.set_page_config(page_title="EIE Institute Class Review", layout="centered")
 st.title("📚 EIE Institute Class Review")
 
-# -------- Helper: Mobile-friendly audio player --------
+# ----------------------------
+# Mobile-safe audio player
+# ----------------------------
 def mobile_audio_player(file_path):
     with open(file_path, "rb") as f:
         data = f.read()
@@ -19,7 +21,9 @@ def mobile_audio_player(file_path):
     """
     st.markdown(audio_html, unsafe_allow_html=True)
 
-# -------- Input --------
+# ----------------------------
+# Input
+# ----------------------------
 text = st.text_area("Enter your article or vocabulary here", height=150)
 
 if st.button("Generate Audio"):
@@ -32,19 +36,23 @@ if st.button("Generate Audio"):
 
         st.success("Audio generated successfully 🎉")
 
+        # ▶ Online Play (Base64)
         st.subheader("▶️ Play Online")
         mobile_audio_player(audio_file)
 
-        st.subheader("⬇️ Download")
-        with open(audio_file, "rb") as file:
+        # ⬇ True file download
+        st.subheader("⬇ Download")
+        with open(audio_file, "rb") as f:
             st.download_button(
                 label="Download MP3",
-                data=file,
+                data=f.read(),   # important: raw bytes
                 file_name="EIE_Lesson.mp3",
-                mime="audio/mp3"
+                mime="audio/mpeg"
             )
 
-# -------- Clear --------
+# ----------------------------
+# Cleanup
+# ----------------------------
 if st.button("Clear Audio"):
     if os.path.exists("lesson_audio.mp3"):
         os.remove("lesson_audio.mp3")
